@@ -1,31 +1,30 @@
-# Essential build tools (install these first)
-setuptools>=65.0.0
-wheel>=0.38.0
-pip>=22.0.0
-
-# Core web scraping dependencies
-requests>=2.28.0,<3.0.0
-beautifulsoup4>=4.11.0,<5.0.0
-# lxml>=4.9.0,<5.0.0  # Commented out due to Python 3.13 compilation issues
-html5lib>=1.1  # Alternative HTML parser for BeautifulSoup
-
-# Selenium for dynamic content
-selenium>=4.10.0,<5.0.0
-webdriver-manager>=3.8.0,<5.0.0
+# Core scraping dependencies
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+selenium>=4.15.0
+webdriver-manager>=4.0.0
 
 # Data processing
-pandas>=1.5.0,<3.0.0
-numpy>=1.24.0,<2.0.0
+pandas>=2.0.0
+numpy>=1.24.0
+csv
 
-# Additional utilities
-urllib3>=1.26.0,<3.0.0
-certifi>=2022.12.7
+# HTTP and networking
+urllib3>=2.0.0
+certifi>=2023.0.0
 
-# Amenity analysis dependencies
-geopy>=2.3.0,<3.0.0  # For geocoding and distance calculations
+# Utilities
+python-dotenv>=1.0.0
+fake-useragent>=1.4.0
+time
+random
+logging
+datetime
+json
+re
 
-# Optional: Install lxml separately if needed
-# For Python 3.13 on Windows, try one of these commands:
-# pip install --only-binary=lxml lxml
-# pip install lxml==4.9.4  # Specific version that may have wheels
-# Or use conda: conda install lxml
+# Optional: Advanced features
+# playwright>=1.40.0  # Alternative to Selenium
+# httpx>=0.25.0       # Modern HTTP client
+# aiohttp>=3.9.0      # Async HTTP requests
