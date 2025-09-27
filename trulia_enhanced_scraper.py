@@ -26,9 +26,16 @@ class TruliaEnhancedScraper:
         self.properties = []
         self.visited_urls = set()  # Track visited URLs to avoid duplicates
         
-        # Professional headers
+        # Professional headers with more variation to avoid blocking
+        self.user_agents = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0'
+        ]
+        
         self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'User-Agent': random.choice(self.user_agents),
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
             'Accept-Language': 'en-US,en;q=0.9',
             'Accept-Encoding': 'gzip, deflate, br',
@@ -42,36 +49,131 @@ class TruliaEnhancedScraper:
         }
         self.session.headers.update(self.headers)
         
-        # Focus on NYC rental areas that are more likely to have listings
-        self.locations = [
+        # Focus on Hoboken, NJ and surrounding Tri-State areas with 50-50 NJ/NY split
+        self.nj_locations = [
             {
-                'name': 'Manhattan Rentals',
-                'urls': ['https://www.trulia.com/for_rent/Manhattan,NY/']
+                'name': 'Hoboken, NJ Rentals',
+                'state': 'NJ',
+                'urls': [
+                    'https://www.trulia.com/for_rent/Hoboken,NJ/',
+                    'https://www.trulia.com/for_rent/Hoboken,NJ/2_p/',
+                    'https://www.trulia.com/for_rent/Hoboken,NJ/3_p/'
+                ]
             },
             {
-                'name': 'Brooklyn Rentals', 
-                'urls': ['https://www.trulia.com/for_rent/Brooklyn,NY/']
+                'name': 'Jersey City, NJ Rentals',
+                'state': 'NJ',
+                'urls': [
+                    'https://www.trulia.com/for_rent/Jersey-City,NJ/',
+                    'https://www.trulia.com/for_rent/Jersey-City,NJ/2_p/',
+                    'https://www.trulia.com/for_rent/Jersey-City,NJ/3_p/'
+                ]
             },
             {
-                'name': 'Queens Rentals',
-                'urls': ['https://www.trulia.com/for_rent/Queens,NY/']
+                'name': 'Weehawken, NJ Rentals',
+                'state': 'NJ',
+                'urls': [
+                    'https://www.trulia.com/for_rent/Weehawken,NJ/',
+                    'https://www.trulia.com/for_rent/Weehawken,NJ/2_p/'
+                ]
             },
             {
-                'name': 'Hoboken Rentals',
-                'urls': ['https://www.trulia.com/for_rent/Hoboken,NJ/']
+                'name': 'Union City, NJ Rentals',
+                'state': 'NJ',
+                'urls': [
+                    'https://www.trulia.com/for_rent/Union-City,NJ/',
+                    'https://www.trulia.com/for_rent/Union-City,NJ/2_p/'
+                ]
             },
             {
-                'name': 'Jersey City Rentals',
-                'urls': ['https://www.trulia.com/for_rent/Jersey-City,NJ/']
+                'name': 'North Bergen, NJ Rentals',
+                'state': 'NJ',
+                'urls': [
+                    'https://www.trulia.com/for_rent/North-Bergen,NJ/',
+                    'https://www.trulia.com/for_rent/North-Bergen,NJ/2_p/'
+                ]
+            },
+            {
+                'name': 'Fort Lee, NJ Rentals',
+                'state': 'NJ',
+                'urls': [
+                    'https://www.trulia.com/for_rent/Fort-Lee,NJ/',
+                    'https://www.trulia.com/for_rent/Fort-Lee,NJ/2_p/'
+                ]
+            },
+            {
+                'name': 'Edgewater, NJ Rentals',
+                'state': 'NJ',
+                'urls': [
+                    'https://www.trulia.com/for_rent/Edgewater,NJ/',
+                    'https://www.trulia.com/for_rent/Edgewater,NJ/2_p/'
+                ]
             }
         ]
+        
+        self.ny_locations = [
+            {
+                'name': 'Manhattan, NY Rentals',
+                'state': 'NY',
+                'urls': [
+                    'https://www.trulia.com/for_rent/Manhattan,NY/',
+                    'https://www.trulia.com/for_rent/Manhattan,NY/2_p/',
+                    'https://www.trulia.com/for_rent/Manhattan,NY/3_p/',
+                    'https://www.trulia.com/for_rent/Manhattan,NY/4_p/'
+                ]
+            },
+            {
+                'name': 'Brooklyn, NY Rentals',
+                'state': 'NY',
+                'urls': [
+                    'https://www.trulia.com/for_rent/Brooklyn,NY/',
+                    'https://www.trulia.com/for_rent/Brooklyn,NY/2_p/',
+                    'https://www.trulia.com/for_rent/Brooklyn,NY/3_p/',
+                    'https://www.trulia.com/for_rent/Brooklyn,NY/4_p/'
+                ]
+            },
+            {
+                'name': 'Queens, NY Rentals',
+                'state': 'NY',
+                'urls': [
+                    'https://www.trulia.com/for_rent/Queens,NY/',
+                    'https://www.trulia.com/for_rent/Queens,NY/2_p/',
+                    'https://www.trulia.com/for_rent/Queens,NY/3_p/'
+                ]
+            },
+            {
+                'name': 'Bronx, NY Rentals',
+                'state': 'NY',
+                'urls': [
+                    'https://www.trulia.com/for_rent/Bronx,NY/',
+                    'https://www.trulia.com/for_rent/Bronx,NY/2_p/',
+                    'https://www.trulia.com/for_rent/Bronx,NY/3_p/'
+                ]
+            },
+            {
+                'name': 'Staten Island, NY Rentals',
+                'state': 'NY',
+                'urls': [
+                    'https://www.trulia.com/for_rent/Staten-Island,NY/',
+                    'https://www.trulia.com/for_rent/Staten-Island,NY/2_p/'
+                ]
+            }
+        ]
+        
+        # Combine all locations for easy access
+        self.all_locations = self.nj_locations + self.ny_locations
+    
+    def rotate_user_agent(self):
+        """Rotate user agent to avoid detection"""
+        self.session.headers.update({'User-Agent': random.choice(self.user_agents)})
     
     def extract_property_urls_from_page(self, url, location_name):
         """Extract property URLs from listing page"""
         logger.info(f"  Extracting property URLs from: {url}")
         
         try:
-            time.sleep(random.uniform(2, 4))
+            time.sleep(random.uniform(5, 10))  # Increased delay to avoid blocking
+            self.rotate_user_agent()  # Change user agent for each request
             response = self.session.get(url, timeout=30)
             
             if response.status_code != 200:
@@ -178,7 +280,7 @@ class TruliaEnhancedScraper:
                     logger.info(f"      {i+1}. {sample_url}")
             
             logger.info(f"    ✅ Found {len(property_urls)} unique property URLs")
-            return property_urls[:15]  # Limit to 15 per page
+            return property_urls[:25]  # Limit to 25 per page for larger dataset
             
         except Exception as e:
             logger.error(f"  ❌ Error extracting URLs from {url}: {e}")
@@ -213,7 +315,8 @@ class TruliaEnhancedScraper:
         logger.info(f"    Scraping details: {property_url}")
         
         try:
-            time.sleep(random.uniform(1, 3))  # Be respectful
+            time.sleep(random.uniform(3, 7))  # Increased delay to avoid blocking
+            self.rotate_user_agent()  # Change user agent for each request
             response = self.session.get(property_url, timeout=25)
             
             if response.status_code != 200:
@@ -447,6 +550,7 @@ class TruliaEnhancedScraper:
             
             if property_data:
                 property_data['location_search'] = location['name']
+                property_data['state'] = location.get('state', 'Unknown')
                 properties.append(property_data)
                 
                 # Stop if we have enough
@@ -456,27 +560,71 @@ class TruliaEnhancedScraper:
         logger.info(f"  ✅ Scraped {len(properties)} properties from {location['name']}")
         return properties
     
-    def scrape_all_locations(self, target_total=30):
-        """Scrape all locations"""
+    def scrape_all_locations(self, target_total=750):
+        """Scrape all locations with 50-50 NJ/NY split"""
         all_properties = []
-        per_location = max(1, target_total // len(self.locations))
+        nj_properties = []
+        ny_properties = []
         
-        logger.info(f"Starting enhanced Trulia scraper")
-        logger.info(f"Target: ~{per_location} properties per location, {target_total} total")
+        # Calculate targets for 50-50 split
+        nj_target = target_total // 2
+        ny_target = target_total // 2
+        
+        logger.info(f"Starting enhanced Trulia scraper for Hoboken, NJ and Tri-State area")
+        logger.info(f"Target: {target_total} total properties ({nj_target} NJ, {ny_target} NY)")
         logger.info(f"Will visit individual property pages for complete data\n")
         
-        for location in self.locations:
-            if len(all_properties) >= target_total:
+        # Scrape NJ locations first (prioritizing Hoboken area)
+        logger.info(f"🏠 Scraping New Jersey locations (target: {nj_target})")
+        nj_per_location = max(1, nj_target // len(self.nj_locations))
+        
+        for location in self.nj_locations:
+            if len(nj_properties) >= nj_target:
                 break
             
-            props = self.scrape_location(location, per_location)
-            all_properties.extend(props)
+            remaining_nj = nj_target - len(nj_properties)
+            props_to_get = min(nj_per_location * 2, remaining_nj)  # Allow more per location if needed
             
-            # Longer delay between locations
-            time.sleep(random.uniform(8, 15))
+            props = self.scrape_location(location, props_to_get)
+            nj_properties.extend(props)
+            
+            logger.info(f"  NJ Progress: {len(nj_properties)}/{nj_target} properties")
+            
+            # Much longer delay between locations to avoid blocking
+            time.sleep(random.uniform(20, 35))
         
-        self.properties = all_properties[:target_total]
-        logger.info(f"\n🎉 Scraped {len(self.properties)} total properties with detailed information")
+        # Scrape NY locations
+        logger.info(f"\n🗽 Scraping New York locations (target: {ny_target})")
+        ny_per_location = max(1, ny_target // len(self.ny_locations))
+        
+        for location in self.ny_locations:
+            if len(ny_properties) >= ny_target:
+                break
+            
+            remaining_ny = ny_target - len(ny_properties)
+            props_to_get = min(ny_per_location * 2, remaining_ny)  # Allow more per location if needed
+            
+            props = self.scrape_location(location, props_to_get)
+            ny_properties.extend(props)
+            
+            logger.info(f"  NY Progress: {len(ny_properties)}/{ny_target} properties")
+            
+            # Much longer delay between locations to avoid blocking
+            time.sleep(random.uniform(20, 35))
+        
+        # Combine results
+        all_properties = nj_properties[:nj_target] + ny_properties[:ny_target]
+        self.properties = all_properties
+        
+        # Log final statistics
+        final_nj = len([p for p in self.properties if p.get('state') == 'NJ'])
+        final_ny = len([p for p in self.properties if p.get('state') == 'NY'])
+        
+        logger.info(f"\n🎉 Scraping completed!")
+        logger.info(f"📊 Total properties: {len(self.properties)}")
+        logger.info(f"🏠 New Jersey: {final_nj} properties ({final_nj/len(self.properties)*100:.1f}%)")
+        logger.info(f"🗽 New York: {final_ny} properties ({final_ny/len(self.properties)*100:.1f}%)")
+        
         return self.properties
     
     def save_to_csv(self, filename='trulia_enhanced_properties.csv'):
@@ -487,7 +635,7 @@ class TruliaEnhancedScraper:
         
         fieldnames = [
             'name', 'price', 'beds', 'baths', 'sqft', 'address', 
-            'latitude', 'longitude', 'location_search', 'url', 
+            'latitude', 'longitude', 'state', 'location_search', 'url', 
             'source', 'scraped_date'
         ]
         
@@ -504,14 +652,14 @@ class TruliaEnhancedScraper:
 def main():
     scraper = TruliaEnhancedScraper()
     
-    print("🏠 Enhanced Trulia Scraper")
-    print("📍 NYC Metro Area Rentals")
-    print("🎯 Visits individual property pages for complete data")
+    print("🏠 Enhanced Trulia Scraper - Hoboken & Tri-State Focus")
+    print("📍 Hoboken, NJ and surrounding NYC Metro Area")
+    print("🎯 Target: 500-1000 properties with 50-50 NJ/NY split")
     print("⚡ Gets prices, beds, baths, sqft, and coordinates\n")
     
     try:
-        # Scrape properties with detailed information
-        properties = scraper.scrape_all_locations(target_total=25)
+        # Scrape properties with detailed information (500-1000 target)
+        properties = scraper.scrape_all_locations(target_total=10)
         
         if properties:
             scraper.save_to_csv()
