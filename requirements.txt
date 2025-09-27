@@ -8,7 +8,6 @@ webdriver-manager>=4.0.0
 # Data processing
 pandas>=2.0.0
 numpy>=1.24.0
-csv
 
 # HTTP and networking
 urllib3>=2.0.0
@@ -17,12 +16,8 @@ certifi>=2023.0.0
 # Utilities
 python-dotenv>=1.0.0
 fake-useragent>=1.4.0
-time
-random
-logging
-datetime
-json
-re
+
+# Note: csv, time, random, logging, datetime, json, re are built-in Python modules
 
 # Optional: Advanced features
 # playwright>=1.40.0  # Alternative to Selenium

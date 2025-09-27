@@ -26,154 +26,57 @@ class TruliaEnhancedScraper:
         self.properties = []
         self.visited_urls = set()  # Track visited URLs to avoid duplicates
         
-        # Professional headers with more variation to avoid blocking
-        self.user_agents = [
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/121.0'
-        ]
-        
+        # Professional headers
         self.headers = {
-            'User-Agent': random.choice(self.user_agents),
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'Accept-Encoding': 'gzip, deflate, br, zstd',
             'Accept-Language': 'en-US,en;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1',
+            'Cache-Control': 'max-age=0',
+            'Cookie': '_pxvid=99f4284e-9bf2-11f0-bda9-d4426d9e0a7f; tlftmusr=250927t39qva9nzsae3atu67hqvnm188',
+            'Referer': 'https://www.google.com/',
+            'Sec-Ch-Ua': '"Chromium";v="140", "Not=A?Brand";v="24", "Google Chrome";v="140"',
+            'Sec-Ch-Ua-Mobile': '?0',
+            'Sec-Ch-Ua-Platform': '"Windows"',
             'Sec-Fetch-Dest': 'document',
             'Sec-Fetch-Mode': 'navigate',
             'Sec-Fetch-Site': 'same-origin',
-            'Cache-Control': 'max-age=0',
-            'Referer': 'https://www.trulia.com/'
+            'Sec-Fetch-User': '?1',
+            'Upgrade-Insecure-Requests': '1',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36'
         }
         self.session.headers.update(self.headers)
         
-        # Focus on Hoboken, NJ and surrounding Tri-State areas with 50-50 NJ/NY split
-        self.nj_locations = [
+        # Focus on NYC rental areas that are more likely to have listings
+        self.locations = [
+
             {
-                'name': 'Hoboken, NJ Rentals',
-                'state': 'NJ',
-                'urls': [
-                    'https://www.trulia.com/for_rent/Hoboken,NJ/',
-                    'https://www.trulia.com/for_rent/Hoboken,NJ/2_p/',
-                    'https://www.trulia.com/for_rent/Hoboken,NJ/3_p/'
-                ]
+                'name': 'Manhattan Rentals',
+                'urls': ['https://www.trulia.com/for_rent/Manhattan,NY/']
             },
             {
-                'name': 'Jersey City, NJ Rentals',
-                'state': 'NJ',
-                'urls': [
-                    'https://www.trulia.com/for_rent/Jersey-City,NJ/',
-                    'https://www.trulia.com/for_rent/Jersey-City,NJ/2_p/',
-                    'https://www.trulia.com/for_rent/Jersey-City,NJ/3_p/'
-                ]
+                'name': 'Brooklyn Rentals', 
+                'urls': ['https://www.trulia.com/for_rent/Brooklyn,NY/']
             },
             {
-                'name': 'Weehawken, NJ Rentals',
-                'state': 'NJ',
-                'urls': [
-                    'https://www.trulia.com/for_rent/Weehawken,NJ/',
-                    'https://www.trulia.com/for_rent/Weehawken,NJ/2_p/'
-                ]
+                'name': 'Queens Rentals',
+                'urls': ['https://www.trulia.com/for_rent/Queens,NY/']
             },
             {
-                'name': 'Union City, NJ Rentals',
-                'state': 'NJ',
-                'urls': [
-                    'https://www.trulia.com/for_rent/Union-City,NJ/',
-                    'https://www.trulia.com/for_rent/Union-City,NJ/2_p/'
-                ]
+                'name': 'Hoboken Rentals',
+                'urls': ['https://www.trulia.com/for_rent/Hoboken,NJ/']
             },
             {
-                'name': 'North Bergen, NJ Rentals',
-                'state': 'NJ',
-                'urls': [
-                    'https://www.trulia.com/for_rent/North-Bergen,NJ/',
-                    'https://www.trulia.com/for_rent/North-Bergen,NJ/2_p/'
-                ]
-            },
-            {
-                'name': 'Fort Lee, NJ Rentals',
-                'state': 'NJ',
-                'urls': [
-                    'https://www.trulia.com/for_rent/Fort-Lee,NJ/',
-                    'https://www.trulia.com/for_rent/Fort-Lee,NJ/2_p/'
-                ]
-            },
-            {
-                'name': 'Edgewater, NJ Rentals',
-                'state': 'NJ',
-                'urls': [
-                    'https://www.trulia.com/for_rent/Edgewater,NJ/',
-                    'https://www.trulia.com/for_rent/Edgewater,NJ/2_p/'
-                ]
+                'name': 'Jersey City Rentals',
+                'urls': ['https://www.trulia.com/for_rent/Jersey-City,NJ/']
             }
         ]
-        
-        self.ny_locations = [
-            {
-                'name': 'Manhattan, NY Rentals',
-                'state': 'NY',
-                'urls': [
-                    'https://www.trulia.com/for_rent/Manhattan,NY/',
-                    'https://www.trulia.com/for_rent/Manhattan,NY/2_p/',
-                    'https://www.trulia.com/for_rent/Manhattan,NY/3_p/',
-                    'https://www.trulia.com/for_rent/Manhattan,NY/4_p/'
-                ]
-            },
-            {
-                'name': 'Brooklyn, NY Rentals',
-                'state': 'NY',
-                'urls': [
-                    'https://www.trulia.com/for_rent/Brooklyn,NY/',
-                    'https://www.trulia.com/for_rent/Brooklyn,NY/2_p/',
-                    'https://www.trulia.com/for_rent/Brooklyn,NY/3_p/',
-                    'https://www.trulia.com/for_rent/Brooklyn,NY/4_p/'
-                ]
-            },
-            {
-                'name': 'Queens, NY Rentals',
-                'state': 'NY',
-                'urls': [
-                    'https://www.trulia.com/for_rent/Queens,NY/',
-                    'https://www.trulia.com/for_rent/Queens,NY/2_p/',
-                    'https://www.trulia.com/for_rent/Queens,NY/3_p/'
-                ]
-            },
-            {
-                'name': 'Bronx, NY Rentals',
-                'state': 'NY',
-                'urls': [
-                    'https://www.trulia.com/for_rent/Bronx,NY/',
-                    'https://www.trulia.com/for_rent/Bronx,NY/2_p/',
-                    'https://www.trulia.com/for_rent/Bronx,NY/3_p/'
-                ]
-            },
-            {
-                'name': 'Staten Island, NY Rentals',
-                'state': 'NY',
-                'urls': [
-                    'https://www.trulia.com/for_rent/Staten-Island,NY/',
-                    'https://www.trulia.com/for_rent/Staten-Island,NY/2_p/'
-                ]
-            }
-        ]
-        
-        # Combine all locations for easy access
-        self.all_locations = self.nj_locations + self.ny_locations
-    
-    def rotate_user_agent(self):
-        """Rotate user agent to avoid detection"""
-        self.session.headers.update({'User-Agent': random.choice(self.user_agents)})
     
     def extract_property_urls_from_page(self, url, location_name):
         """Extract property URLs from listing page"""
         logger.info(f"  Extracting property URLs from: {url}")
         
         try:
-            time.sleep(random.uniform(5, 10))  # Increased delay to avoid blocking
-            self.rotate_user_agent()  # Change user agent for each request
+            time.sleep(random.uniform(2, 4))
             response = self.session.get(url, timeout=30)
             
             if response.status_code != 200:
@@ -280,7 +183,7 @@ class TruliaEnhancedScraper:
                     logger.info(f"      {i+1}. {sample_url}")
             
             logger.info(f"    ✅ Found {len(property_urls)} unique property URLs")
-            return property_urls[:25]  # Limit to 25 per page for larger dataset
+            return property_urls[:15]  # Limit to 15 per page
             
         except Exception as e:
             logger.error(f"  ❌ Error extracting URLs from {url}: {e}")
@@ -315,8 +218,7 @@ class TruliaEnhancedScraper:
         logger.info(f"    Scraping details: {property_url}")
         
         try:
-            time.sleep(random.uniform(3, 7))  # Increased delay to avoid blocking
-            self.rotate_user_agent()  # Change user agent for each request
+            time.sleep(random.uniform(1, 3))  # Be respectful
             response = self.session.get(property_url, timeout=25)
             
             if response.status_code != 200:
@@ -360,7 +262,7 @@ class TruliaEnhancedScraper:
                     property_data['address'] = re.sub(r'\s+', ' ', address_text)
                     break
             
-            # Extract price
+            # Extract price (handle ranges like $2,000-$3,500)
             price_selectors = [
                 '[data-testid="property-price"]',
                 '.property-price',
@@ -373,10 +275,24 @@ class TruliaEnhancedScraper:
                 price_elem = soup.select_one(selector)
                 if price_elem:
                     price_text = price_elem.get_text(strip=True)
-                    # Clean up price
-                    price_match = re.search(r'\$[\d,]+', price_text)
+                    
+                    # Try to match price ranges first (e.g., $2,000-$3,500)
+                    price_range_match = re.search(r'\$([\d,]+)\s*[-–—]\s*\$([\d,]+)', price_text)
+                    if price_range_match:
+                        min_price = price_range_match.group(1).replace(',', '')
+                        max_price = price_range_match.group(2).replace(',', '')
+                        property_data['price_min'] = min_price
+                        property_data['price_max'] = max_price
+                        property_data['price'] = f"${min_price}-${max_price}"
+                        break
+                    
+                    # If no range, try single price
+                    price_match = re.search(r'\$([\d,]+)', price_text)
                     if price_match:
-                        property_data['price'] = price_match.group()
+                        single_price = price_match.group(1).replace(',', '')
+                        property_data['price'] = f"${single_price}"
+                        property_data['price_min'] = single_price
+                        property_data['price_max'] = single_price
                         break
             
             # Extract beds, baths, sqft from property details
@@ -398,8 +314,15 @@ class TruliaEnhancedScraper:
             if not details_text:
                 details_text = soup.get_text()
             
-            # Extract beds
-            bed_patterns = [
+            # Extract beds (handle ranges like 2-3 beds)
+            bed_range_patterns = [
+                r'(\d+)\s*[-–—]\s*(\d+)\s*bed(?:room)?s?',
+                r'(\d+)\s*[-–—]\s*(\d+)\s*br\b',
+                r'(\d+)[-–—](\d+)bd\b',
+                r'Beds:\s*(\d+)\s*[-–—]\s*(\d+)'
+            ]
+            
+            bed_single_patterns = [
                 r'(\d+)\s*bed(?:room)?s?',
                 r'(\d+)\s*br\b',
                 r'(\d+)bd\b',
@@ -407,14 +330,37 @@ class TruliaEnhancedScraper:
                 r'(\d+)\s*Bed'
             ]
             
-            for pattern in bed_patterns:
+            # Try range patterns first
+            for pattern in bed_range_patterns:
                 bed_match = re.search(pattern, details_text, re.IGNORECASE)
                 if bed_match:
-                    property_data['beds'] = bed_match.group(1)
+                    min_beds = bed_match.group(1)
+                    max_beds = bed_match.group(2)
+                    property_data['beds_min'] = min_beds
+                    property_data['beds_max'] = max_beds
+                    property_data['beds'] = f"{min_beds}-{max_beds}"
                     break
             
-            # Extract baths
-            bath_patterns = [
+            # If no range found, try single bed patterns
+            if 'beds' not in property_data:
+                for pattern in bed_single_patterns:
+                    bed_match = re.search(pattern, details_text, re.IGNORECASE)
+                    if bed_match:
+                        single_beds = bed_match.group(1)
+                        property_data['beds'] = single_beds
+                        property_data['beds_min'] = single_beds
+                        property_data['beds_max'] = single_beds
+                        break
+            
+            # Extract baths (handle ranges like 1.5-2.5 baths)
+            bath_range_patterns = [
+                r'(\d+(?:\.\d+)?)\s*[-–—]\s*(\d+(?:\.\d+)?)\s*bath(?:room)?s?',
+                r'(\d+(?:\.\d+)?)\s*[-–—]\s*(\d+(?:\.\d+)?)\s*ba\b',
+                r'(\d+(?:\.\d+)?)[-–—](\d+(?:\.\d+)?)ba\b',
+                r'Baths:\s*(\d+(?:\.\d+)?)\s*[-–—]\s*(\d+(?:\.\d+)?)'
+            ]
+            
+            bath_single_patterns = [
                 r'(\d+(?:\.\d+)?)\s*bath(?:room)?s?',
                 r'(\d+(?:\.\d+)?)\s*ba\b',
                 r'(\d+(?:\.\d+)?)ba\b',
@@ -422,14 +368,38 @@ class TruliaEnhancedScraper:
                 r'(\d+(?:\.\d+)?)\s*Bath'
             ]
             
-            for pattern in bath_patterns:
+            # Try range patterns first
+            for pattern in bath_range_patterns:
                 bath_match = re.search(pattern, details_text, re.IGNORECASE)
                 if bath_match:
-                    property_data['baths'] = bath_match.group(1)
+                    min_baths = bath_match.group(1)
+                    max_baths = bath_match.group(2)
+                    property_data['baths_min'] = min_baths
+                    property_data['baths_max'] = max_baths
+                    property_data['baths'] = f"{min_baths}-{max_baths}"
                     break
             
-            # Extract square footage
-            sqft_patterns = [
+            # If no range found, try single bath patterns
+            if 'baths' not in property_data:
+                for pattern in bath_single_patterns:
+                    bath_match = re.search(pattern, details_text, re.IGNORECASE)
+                    if bath_match:
+                        single_baths = bath_match.group(1)
+                        property_data['baths'] = single_baths
+                        property_data['baths_min'] = single_baths
+                        property_data['baths_max'] = single_baths
+                        break
+            
+            # Extract square footage (handle ranges like 800-1200 sqft)
+            sqft_range_patterns = [
+                r'([\d,]+)\s*[-–—]\s*([\d,]+)\s*sq\.?\s*ft',
+                r'([\d,]+)\s*[-–—]\s*([\d,]+)\s*sqft',
+                r'([\d,]+)\s*[-–—]\s*([\d,]+)\s*square\s*feet',
+                r'Sq Ft:\s*([\d,]+)\s*[-–—]\s*([\d,]+)',
+                r'Size:\s*([\d,]+)\s*[-–—]\s*([\d,]+)\s*sq'
+            ]
+            
+            sqft_single_patterns = [
                 r'([\d,]+)\s*sq\.?\s*ft',
                 r'([\d,]+)\s*sqft',
                 r'([\d,]+)\s*square\s*feet',
@@ -437,11 +407,27 @@ class TruliaEnhancedScraper:
                 r'Size:\s*([\d,]+)\s*sq'
             ]
             
-            for pattern in sqft_patterns:
+            # Try range patterns first
+            for pattern in sqft_range_patterns:
                 sqft_match = re.search(pattern, details_text, re.IGNORECASE)
                 if sqft_match:
-                    property_data['sqft'] = sqft_match.group(1).replace(',', '')
+                    min_sqft = sqft_match.group(1).replace(',', '')
+                    max_sqft = sqft_match.group(2).replace(',', '')
+                    property_data['sqft_min'] = min_sqft
+                    property_data['sqft_max'] = max_sqft
+                    property_data['sqft'] = f"{min_sqft}-{max_sqft}"
                     break
+            
+            # If no range found, try single sqft patterns
+            if 'sqft' not in property_data:
+                for pattern in sqft_single_patterns:
+                    sqft_match = re.search(pattern, details_text, re.IGNORECASE)
+                    if sqft_match:
+                        single_sqft = sqft_match.group(1).replace(',', '')
+                        property_data['sqft'] = single_sqft
+                        property_data['sqft_min'] = single_sqft
+                        property_data['sqft_max'] = single_sqft
+                        break
             
             # Extract coordinates from JSON-LD or scripts
             coordinates = self.extract_coordinates_from_page(soup)
@@ -550,7 +536,6 @@ class TruliaEnhancedScraper:
             
             if property_data:
                 property_data['location_search'] = location['name']
-                property_data['state'] = location.get('state', 'Unknown')
                 properties.append(property_data)
                 
                 # Stop if we have enough
@@ -560,71 +545,27 @@ class TruliaEnhancedScraper:
         logger.info(f"  ✅ Scraped {len(properties)} properties from {location['name']}")
         return properties
     
-    def scrape_all_locations(self, target_total=750):
-        """Scrape all locations with 50-50 NJ/NY split"""
+    def scrape_all_locations(self, target_total=30):
+        """Scrape all locations"""
         all_properties = []
-        nj_properties = []
-        ny_properties = []
+        per_location = max(1, target_total // len(self.locations))
         
-        # Calculate targets for 50-50 split
-        nj_target = target_total // 2
-        ny_target = target_total // 2
-        
-        logger.info(f"Starting enhanced Trulia scraper for Hoboken, NJ and Tri-State area")
-        logger.info(f"Target: {target_total} total properties ({nj_target} NJ, {ny_target} NY)")
+        logger.info(f"Starting enhanced Trulia scraper")
+        logger.info(f"Target: ~{per_location} properties per location, {target_total} total")
         logger.info(f"Will visit individual property pages for complete data\n")
         
-        # Scrape NJ locations first (prioritizing Hoboken area)
-        logger.info(f"🏠 Scraping New Jersey locations (target: {nj_target})")
-        nj_per_location = max(1, nj_target // len(self.nj_locations))
-        
-        for location in self.nj_locations:
-            if len(nj_properties) >= nj_target:
+        for location in self.locations:
+            if len(all_properties) >= target_total:
                 break
             
-            remaining_nj = nj_target - len(nj_properties)
-            props_to_get = min(nj_per_location * 2, remaining_nj)  # Allow more per location if needed
+            props = self.scrape_location(location, per_location)
+            all_properties.extend(props)
             
-            props = self.scrape_location(location, props_to_get)
-            nj_properties.extend(props)
-            
-            logger.info(f"  NJ Progress: {len(nj_properties)}/{nj_target} properties")
-            
-            # Much longer delay between locations to avoid blocking
-            time.sleep(random.uniform(20, 35))
+            # Longer delay between locations
+            time.sleep(random.uniform(8, 15))
         
-        # Scrape NY locations
-        logger.info(f"\n🗽 Scraping New York locations (target: {ny_target})")
-        ny_per_location = max(1, ny_target // len(self.ny_locations))
-        
-        for location in self.ny_locations:
-            if len(ny_properties) >= ny_target:
-                break
-            
-            remaining_ny = ny_target - len(ny_properties)
-            props_to_get = min(ny_per_location * 2, remaining_ny)  # Allow more per location if needed
-            
-            props = self.scrape_location(location, props_to_get)
-            ny_properties.extend(props)
-            
-            logger.info(f"  NY Progress: {len(ny_properties)}/{ny_target} properties")
-            
-            # Much longer delay between locations to avoid blocking
-            time.sleep(random.uniform(20, 35))
-        
-        # Combine results
-        all_properties = nj_properties[:nj_target] + ny_properties[:ny_target]
-        self.properties = all_properties
-        
-        # Log final statistics
-        final_nj = len([p for p in self.properties if p.get('state') == 'NJ'])
-        final_ny = len([p for p in self.properties if p.get('state') == 'NY'])
-        
-        logger.info(f"\n🎉 Scraping completed!")
-        logger.info(f"📊 Total properties: {len(self.properties)}")
-        logger.info(f"🏠 New Jersey: {final_nj} properties ({final_nj/len(self.properties)*100:.1f}%)")
-        logger.info(f"🗽 New York: {final_ny} properties ({final_ny/len(self.properties)*100:.1f}%)")
-        
+        self.properties = all_properties[:target_total]
+        logger.info(f"\n🎉 Scraped {len(self.properties)} total properties with detailed information")
         return self.properties
     
     def save_to_csv(self, filename='trulia_enhanced_properties.csv'):
@@ -634,15 +575,14 @@ class TruliaEnhancedScraper:
             return
         
         fieldnames = [
-            'name', 'price', 'beds', 'baths', 'sqft', 'address', 
-            'latitude', 'longitude', 'state', 'location_search', 'url', 
-            'source', 'scraped_date'
+            'name', 'price', 'price_min', 'price_max', 'beds', 'beds_min', 'beds_max', 
+            'baths', 'baths_min', 'baths_max', 'sqft', 'sqft_min', 'sqft_max', 'address', 
+            'latitude', 'longitude', 'location_search', 'url', 'source', 'scraped_date'
         ]
         
         with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             writer.writeheader()
-            
             for prop in self.properties:
                 row = {field: prop.get(field, '') for field in fieldnames}
                 writer.writerow(row)
@@ -652,13 +592,13 @@ class TruliaEnhancedScraper:
 def main():
     scraper = TruliaEnhancedScraper()
     
-    print("🏠 Enhanced Trulia Scraper - Hoboken & Tri-State Focus")
-    print("📍 Hoboken, NJ and surrounding NYC Metro Area")
-    print("🎯 Target: 500-1000 properties with 50-50 NJ/NY split")
+    print("🏠 Enhanced Trulia Scraper")
+    print("📍 NYC Metro Area Rentals")
+    print("🎯 Visits individual property pages for complete data")
     print("⚡ Gets prices, beds, baths, sqft, and coordinates\n")
     
     try:
-        # Scrape properties with detailed information (500-1000 target)
+        # Scrape properties with detailed information
         properties = scraper.scrape_all_locations(target_total=10)
         
         if properties:
